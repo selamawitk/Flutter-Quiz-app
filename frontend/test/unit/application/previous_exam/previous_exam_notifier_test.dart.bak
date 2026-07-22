@@ -1,0 +1,50 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:frontend/application/previous_exam/previous_exam_notifier.dart';
+import 'package:frontend/presentation/previous_exam/previous_exam_controller.dart';
+
+// Mock classes
+class MockPreviousExamController extends Mock implements PreviousExamController {}
+
+void main() {
+  late PreviousExamNotifier notifier;
+  late MockPreviousExamController mockController;
+
+  setUp(() {
+    mockController = MockPreviousExamController();
+    notifier = PreviousExamNotifier(controller: mockController);
+  });
+
+  test('onFirstQuizIdChange updates state', () {
+    notifier.onFirstQuizIdChange('abc123');
+    expect(notifier.state.firstQuizId, 'abc123');
+  });
+
+  test('onSecondQuizIdChange updates state', () {
+    notifier.onSecondQuizIdChange('xyz789');
+    expect(notifier.state.secondQuizId, 'xyz789');
+  });
+
+  test('onViewClicked calls controller.viewExam with correct ID', () {
+    notifier.onFirstQuizIdChange('test123');
+    
+    when(() => mockController.viewExam('test123')).thenAnswer((_) async => Future.value());
+
+    notifier.onViewClicked();
+
+    verify(() => mockController.viewExam('test123')).called(1);
+  });
+
+  test('onContinueClicked calls controller.continueExam with correct ID', () {
+    notifier.onSecondQuizIdChange('test456');
+    
+    when(() => mockController.continueExam('test456')).thenAnswer((_) async => Future.value());
+
+    notifier.onContinueClicked();
+
+    verify(() => mockController.continueExam('test456')).called(1);
+  });
+}
+
+
